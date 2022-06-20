@@ -1,10 +1,7 @@
-name: Update Files
+name: update fleet files on master branch creation
 on:
   create:
-  
-  # repository_dispatch:
-  #   types: [template-update]
-  # workflow_dispatch:
+    branches: [master]
 jobs:
   template-update:
     runs-on: ubuntu-latest
