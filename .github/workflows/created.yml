@@ -1,0 +1,40 @@
+name: Update Files
+on:
+  create:
+  
+  # repository_dispatch:
+  #   types: [template-update]
+  # workflow_dispatch:
+jobs:
+  template-update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout master
+      - uses: actions/checkout@v2
+        with: 
+          ref: master
+      - name: setup python
+      - uses: actions/setup-python@v3
+        with:
+          python-version: "3.9"
+      - name: generate files from basic templates
+      - run: |
+          repo_name=${{github.event.repository.name}}
+          cd /home/runner/work/${{repo_name}}/${{repo_name}}
+          python scripts/generate_files.py ${{repo_name}}
+      - name: get variant's docker compose
+      - run: |
+          cd /home/runner/work/${{repo_name}}/${{repo_name}}
+          rm docker-compose.yml
+          wget https://raw.githubusercontent.com/NebraLtd/helium-miner-software/master/device-compose-files/docker-compose-rpi.yml -O docker-compose.yml
+      - name: Push updated docker compose and balena.yml files
+        if: success()
+        uses: test-room-7/action-update-file@v1
+        with:
+          branch: master
+          file-path: |
+            balena.yml
+            docker-compose.yml
+            README.md
+          commit-msg: create balena.yml, docker-compose.yml and README.md             
+          github-token: ${{ secrets.MR_BUMP }}
