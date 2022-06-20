@@ -8,13 +8,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-        with: 
+        with:
           ref: master
       - run: |
-          repo_name=${{github.event.repository.name}}
-          cd /home/runner/work/${{repo_name}}/${{repo_name}}
-          rm docker-compose.yml
-          wget https://raw.githubusercontent.com/NebraLtd/helium-miner-software/master/device-compose-files/docker-compose-rpi.yml -O docker-compose.yml
+          .github/workflows/scripts/update_files.sh ${{ github.repository }}
       - name: Push updated docker compose file
         if: success()
         uses: test-room-7/action-update-file@v1
@@ -22,5 +19,5 @@ jobs:
           branch: master
           file-path: |
             docker-compose.yml
-          commit-msg: Update docker-compose.yml              
+          commit-msg: Update docker-compose.yml
           github-token: ${{ secrets.MR_BUMP }}
